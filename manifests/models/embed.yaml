@@ -1,0 +1,21 @@
+# Multilingual embedding model on the CPU pool (no toleration → no GPU node).
+#   http://embed-predictor.models.svc.cluster.local/openai/v1/embeddings
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: embed
+  namespace: models
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 2
+    model:
+      modelFormat: { name: huggingface }
+      storageUri: hf://intfloat/multilingual-e5-small
+      args:
+        - --model_name=embed
+        - --backend=huggingface
+        - --task=text_embedding
+      resources:
+        requests: { cpu: "1", memory: 2Gi }
+        limits: { cpu: "2", memory: 4Gi }

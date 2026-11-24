@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Beyond the Code: KI-Modelle mit KServe und GPUs in Kubernetes orchestrieren",
+    "speaker": "Thorsten Hans",
+    "language": "de",
+    "abstract": "Die beste KI-Anwendung nützt nichts ohne die passende Infrastruktur. In diesem Vortrag erfahren .NET-Entwickler, wie sie GPU-gestützte Kubernetes-Cluster und KServe mittels Terraform oder Pulumi vollautomatisiert per Infrastructure as Code (IaC) bereitstellen. Thorsten zeigt praxisnah, wie unterschiedliche KI-Modelle bereitgestellt, betrieben und als robuste Endpunkte nahtlos für Ihre .NET-Applikationen zugänglich gemacht werden. Cloud-Native AI von der Provisionierung bis zum API-Call!"
+  },
+  {
+    "title": "[Sample] Minimal APIs in der Praxis",
+    "speaker": "[Speaker]",
+    "language": "de",
+    "abstract": "Wie man mit ASP.NET Core Minimal APIs schlanke, testbare HTTP-Schnittstellen baut: Routing, Validierung, OpenAPI und Authentifizierung ohne Controller-Ballast."
+  },
+  {
+    "title": "[Sample] Observability for .NET with OpenTelemetry",
+    "speaker": "[Speaker]",
+    "language": "en",
+    "abstract": "Traces, metrics and logs from ASP.NET Core to the database and back. We instrument a distributed .NET system with OpenTelemetry and explore it in the Aspire dashboard."
+  },
+  {
+    "title": "[Sample] GPU-Workloads in Kubernetes richtig planen",
+    "speaker": "[Speaker]",
+    "language": "de",
+    "abstract": "Taints, Tolerations, Device Plugins und Time-Slicing: wie Kubernetes teure GPU-Nodes verteilt und wie man verhindert, dass normale Workloads sie blockieren."
+  },
+  {
+    "title": "[Sample] Retrieval-Augmented Generation with Microsoft.Extensions.AI",
+    "speaker": "[Speaker]",
+    "language": "en",
+    "abstract": "Build a RAG pipeline in .NET: chunking documents, generating embeddings, storing vectors and grounding LLM answers in your own data using IChatClient and IEmbeddingGenerator."
+  },
+  {
+    "title": "[Sample] Infrastructure as Code mit C# und Pulumi",
+    "speaker": "[Speaker]",
+    "language": "de",
+    "abstract": "Cloud-Infrastruktur in der Sprache, die das Team ohnehin spricht: Pulumi-Programme in C#, wiederverwendbare Komponenten, Tests und Deployments aus der CI-Pipeline."
+  },
+  {
+    "title": "[Sample] Securing APIs with OAuth 2.0 and OpenID Connect",
+    "speaker": "[Speaker]",
+    "language": "en",
+    "abstract": "Tokens, scopes and flows explained for application developers. We protect an ASP.NET Core API with OpenID Connect and look at common mistakes in production."
+  },
+  {
+    "title": "[Sample] Blazor für Business-Anwendungen",
+    "speaker": "[Speaker]",
+    "language": "de",
+    "abstract": "Formulare, Tabellen und Validierung: wie Teams mit Blazor produktive Geschäftsanwendungen bauen und dabei C# im Frontend wie im Backend nutzen."
+  }
+]

@@ -1,0 +1,31 @@
+# Cluster credentials
+kubeconfig.yaml
+*.kubeconfig
+
+# Terraform
+.terraform/
+.terraform.lock.hcl.bak
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+
+# Pulumi
+iac/pulumi/Pulumi.*.secrets.yaml
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+.idea/
+TestResults/
+
+# OS / editors
+.DS_Store
+*.swp
+
+# Local environment (tokens!)
+.env
+.envrc

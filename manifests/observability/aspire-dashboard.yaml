@@ -1,0 +1,49 @@
+# Standalone Aspire dashboard as an in-cluster OTLP endpoint for traces, metrics and logs.
+# Authentication is disabled for the demo, so it is NOT exposed: use
+#   kubectl port-forward -n observability svc/aspire-dashboard 18888:18888
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aspire-dashboard
+  namespace: observability
+  labels: { app: aspire-dashboard }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: aspire-dashboard }
+  template:
+    metadata:
+      labels: { app: aspire-dashboard }
+    spec:
+      containers:
+        - name: dashboard
+          image: mcr.microsoft.com/dotnet/aspire-dashboard:latest   # pin a version for anything beyond the demo
+          ports:
+            - { name: ui, containerPort: 18888 }
+            - { name: otlp-grpc, containerPort: 18889 }
+            - { name: otlp-http, containerPort: 18890 }
+          env:
+            - name: ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS
+              value: "true"
+            - name: DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS   # older dashboard versions
+              value: "true"
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 1Gi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aspire-dashboard
+  namespace: observability
+spec:
+  selector: { app: aspire-dashboard }
+  ports:
+    - { name: ui, port: 18888, targetPort: ui }
+    - { name: otlp-grpc, port: 18889, targetPort: otlp-grpc }
+    - { name: otlp-http, port: 18890, targetPort: otlp-http }

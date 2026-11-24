@@ -1,0 +1,12 @@
+# Cluster-internal: traffic reaches the app through the Gateway (manifests/gateway/)
+# and the HTTPRoute in httproute.yaml.
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: app
+spec:
+  type: ClusterIP
+  selector: { app: api }
+  ports:
+    - { name: http, port: 80, targetPort: http }

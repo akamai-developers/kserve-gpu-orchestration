@@ -1,0 +1,3 @@
+name: beyond-the-code
+description: LKE cluster with a GPU node pool, the NVIDIA GPU Operator and KServe (C#)
+runtime: dotnet

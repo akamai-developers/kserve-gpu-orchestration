@@ -1,0 +1,92 @@
+# Builds the .NET API and publishes it as a container image to GitHub Container Registry.
+# No Dockerfile: the .NET SDK builds the image (dotnet publish -t:PublishContainer).
+#
+#   pull request → compile only (nothing is pushed)
+#   push to main → ghcr.io/<owner>/beyond-the-code-api:sha-<short-sha> and :latest
+#   tag v1.2.3   → ghcr.io/<owner>/beyond-the-code-api:1.2.3 and :latest
+#
+# Authentication uses the workflow's GITHUB_TOKEN; no personal access token is needed.
+name: API image
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+    paths:
+      - "src/**"
+      - ".github/workflows/api-image.yml"
+  pull_request:
+    paths:
+      - "src/**"
+      - ".github/workflows/api-image.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: api-image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  PROJECT: src/Api/Api.csproj
+  IMAGE_NAME: beyond-the-code-api
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Build
+        run: dotnet build "$PROJECT" -c Release
+
+      - name: Compute image tags
+        if: github.event_name != 'pull_request'
+        id: meta
+        run: |
+          # Image names must be lowercase; GitHub user and org names may not be.
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="sha-${GITHUB_SHA::7}"
+          fi
+          echo "repository=$owner/$IMAGE_NAME" >> "$GITHUB_OUTPUT"
+          echo "tags=$version;latest"          >> "$GITHUB_OUTPUT"
+          echo "image=ghcr.io/$owner/$IMAGE_NAME:$version" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # LKE nodes are x64. The .NET SDK reads the credentials docker/login-action stored.
+      - name: Publish image
+        if: github.event_name != 'pull_request'
+        run: |
+          dotnet publish "$PROJECT" -c Release --os linux --arch x64 -t:PublishContainer \
+            -p:ContainerRegistry=ghcr.io \
+            -p:ContainerRepository="${{ steps.meta.outputs.repository }}" \
+            -p:ContainerImageTags='"${{ steps.meta.outputs.tags }}"'
+
+      - name: Summary
+        if: github.event_name != 'pull_request'
+        run: |
+          {
+            echo "### Published \`${{ steps.meta.outputs.image }}\`"
+            echo
+            echo '```bash'
+            echo "kubectl set image deployment/api api=${{ steps.meta.outputs.image }} -n app"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

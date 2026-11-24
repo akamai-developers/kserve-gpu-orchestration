@@ -1,0 +1,16 @@
+@Api = http://localhost:5080
+
+### Ask the LLM (streams plain text)
+POST {{Api}}/ask
+Content-Type: application/json
+
+{ "question": "Wie bringe ich ein Open-Weight-Modell auf Kubernetes?" }
+
+### Semantic search over the talk abstracts
+POST {{Api}}/search
+Content-Type: application/json
+
+{ "query": "GPU scheduling in Kubernetes", "top": 3 }
+
+### Health
+GET {{Api}}/healthz

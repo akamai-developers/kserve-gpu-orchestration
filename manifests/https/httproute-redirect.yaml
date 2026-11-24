@@ -1,0 +1,24 @@
+# HTTPS add-on (docs/https-with-custom-domain.md).
+# Redirects plain-HTTP requests for your hostname to HTTPS. A route with a
+# matching hostname takes precedence over the app's hostname-less route, so
+# requests to the raw IP still reach the app over HTTP. cert-manager's challenge
+# route (an exact path match) wins over this prefix match, so issuance and
+# renewal keep working.
+# Replace api.example.com with your hostname.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: https-redirect
+  namespace: gateway
+spec:
+  parentRefs:
+    - { name: public, sectionName: http }
+  hostnames: [api.example.com]
+  rules:
+    - matches:
+        - path: { type: PathPrefix, value: / }
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301

@@ -1,0 +1,15 @@
+# Non-secret stack configuration. The Linode API token comes from the
+# LINODE_TOKEN environment variable (or: pulumi config set --secret linode:token ...).
+config:
+  beyond-the-code:region: de-fra-2
+  beyond-the-code:k8sVersion: "1.34"             # linode-cli lke versions-list
+  beyond-the-code:cpuNodeType: g6-standard-4
+  beyond-the-code:cpuNodeCount: "3"
+  beyond-the-code:gpuNodeType: g2-gpu-rtx4000a1-s  # linode-cli linodes types --text | grep -i gpu
+  beyond-the-code:gpuNodeMin: "1"
+  beyond-the-code:gpuNodeMax: "2"
+  beyond-the-code:certManagerVersion: v1.21.3
+  beyond-the-code:gpuOperatorVersion: v26.7.3
+  beyond-the-code:kserveVersion: v0.21.0
+  beyond-the-code:gatewayApiVersion: v1.7.0
+  beyond-the-code:nginxGatewayFabricVersion: 2.9.0

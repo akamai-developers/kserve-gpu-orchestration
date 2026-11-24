@@ -1,0 +1,29 @@
+# Routes all traffic arriving at the Gateway to the app. No hostname and no
+# sectionName: the route matches requests to the raw IP and attaches to every
+# listener, so it also serves HTTPS once the add-on adds an HTTPS listener.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: api
+  namespace: app
+spec:
+  parentRefs:
+    - { name: public, namespace: gateway }
+  rules:
+    - matches:
+        - path: { type: PathPrefix, value: / }
+      backendRefs:
+        - { name: api, port: 80 }
+---
+# NGINX buffers upstream responses by default, which would hold back the
+# streamed /ask answer until it is complete. Turn buffering off for this route.
+apiVersion: gateway.nginx.org/v1alpha1
+kind: ProxySettingsPolicy
+metadata:
+  name: api-no-buffering
+  namespace: app
+spec:
+  targetRefs:
+    - { group: gateway.networking.k8s.io, kind: HTTPRoute, name: api }
+  buffering:
+    disable: true

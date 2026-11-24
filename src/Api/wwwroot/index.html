@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Beyond the Code · Demo</title>
+  <style>
+    :root { --navy: #002F6C; --blue: #00A4EB; --orange: #FF8B00; --grey: #F5F5F5; --text: #2A2A2B; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Instrument Sans", Arial, sans-serif; color: var(--text); background: #FFFFFF; }
+    header { background: var(--navy); color: #FFFFFF; padding: 24px 40px; }
+    header h1 { margin: 0; font-size: 28px; }
+    header p { margin: 4px 0 0; color: #CECECE; }
+    main { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; padding: 32px 40px; max-width: 1400px; }
+    section { background: var(--grey); border-radius: 16px; padding: 24px; }
+    h2 { margin: 0 0 12px; color: var(--navy); font-size: 22px; }
+    form { display: flex; gap: 8px; }
+    input { flex: 1; font: inherit; padding: 10px 12px; border: 2px solid #CECECE; border-radius: 8px; }
+    button { font: inherit; font-weight: 600; padding: 10px 18px; border: 0; border-radius: 8px; background: var(--navy); color: #FFFFFF; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    #answer { white-space: pre-wrap; line-height: 1.5; margin-top: 16px; min-height: 120px; }
+    ol { padding-left: 20px; }
+    li { margin: 10px 0; }
+    .score { font-family: monospace; color: #4B4A4D; }
+    .lang { font-size: 12px; font-weight: 600; color: var(--navy); background: #FFFFFF; border: 1px solid var(--blue); border-radius: 4px; padding: 1px 6px; margin-left: 6px; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Beyond the Code</h1>
+    <p>A .NET app on LKE, talking to open-weight models served by KServe.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Ask the LLM <small>(Qwen3-4B on a GPU)</small></h2>
+      <form id="ask-form">
+        <input id="question" value="Wie bringe ich ein Open-Weight-Modell auf Kubernetes?" aria-label="Question">
+        <button>Ask</button>
+      </form>
+      <div id="answer" aria-live="polite"></div>
+    </section>
+    <section>
+      <h2>Semantic search <small>(multilingual-e5 on CPU)</small></h2>
+      <form id="search-form">
+        <input id="query" value="GPU scheduling in Kubernetes" aria-label="Search query">
+        <button>Search</button>
+      </form>
+      <ol id="results"></ol>
+    </section>
+  </main>
+  <script>
+    const askForm = document.getElementById("ask-form");
+    askForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const button = askForm.querySelector("button");
+      const answer = document.getElementById("answer");
+      button.disabled = true;
+      answer.textContent = "";
+      try {
+        const res = await fetch("/ask", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ question: document.getElementById("question").value })
+        });
+        if (!res.ok) { answer.textContent = `Error ${res.status}: ${await res.text()}`; return; }
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        for (;;) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          answer.textContent += decoder.decode(value, { stream: true });
+        }
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    const searchForm = document.getElementById("search-form");
+    searchForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const list = document.getElementById("results");
+      list.textContent = "Searching…";
+      const res = await fetch("/search", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ query: document.getElementById("query").value, top: 3 })
+      });
+      list.textContent = "";
+      if (!res.ok) { list.textContent = `Error ${res.status}`; return; }
+      for (const hit of await res.json()) {
+        const li = document.createElement("li");
+        const title = document.createElement("strong");
+        title.textContent = hit.title;
+        const lang = document.createElement("span");
+        lang.className = "lang";
+        lang.textContent = hit.language.toUpperCase();
+        const meta = document.createElement("div");
+        meta.className = "score";
+        meta.textContent = `${hit.speaker} · score ${hit.score}`;
+        li.append(title, lang, meta);
+        list.append(li);
+      }
+    });
+  </script>
+</body>
+</html>

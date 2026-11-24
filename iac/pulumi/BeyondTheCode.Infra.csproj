@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Pulumi" Version="3.120.0" />
+        <PackageReference Include="Pulumi.Kubernetes" Version="4.34.3" />
+        <PackageReference Include="Pulumi.Linode" Version="6.10.0" />
+
+        <!-- The Pulumi SDK pulls in OpenTelemetry 1.9.0, which has known vulnerabilities
+             (GHSA-g94r-2vxg-569j, GHSA-4625-4j76-fww9). Pin current versions instead. -->
+        <PackageReference Include="OpenTelemetry.Api" Version="1.21.0" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.21.0" />
+    </ItemGroup>
+
+</Project>

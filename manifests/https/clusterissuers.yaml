@@ -1,0 +1,35 @@
+# HTTPS add-on (docs/https-with-custom-domain.md).
+# Let's Encrypt issuers that solve HTTP-01 challenges through the Gateway API:
+# cert-manager attaches a temporary HTTPRoute to the Gateway's "http" listener.
+# Replace you@example.com with your e-mail address (expiry notices go there).
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: you@example.com
+    privateKeySecretRef:
+      name: letsencrypt-staging-account
+    solvers:
+      - http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - { kind: Gateway, name: public, namespace: gateway, sectionName: http }
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: you@example.com
+    privateKeySecretRef:
+      name: letsencrypt-prod-account
+    solvers:
+      - http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - { kind: Gateway, name: public, namespace: gateway, sectionName: http }

@@ -1,0 +1,8 @@
+{
+  "model": "qwen",
+  "messages": [
+    { "role": "system", "content": "Answer concisely." },
+    { "role": "user", "content": "Erkläre KServe in zwei Sätzen." }
+  ],
+  "max_tokens": 200
+}

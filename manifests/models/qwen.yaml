@@ -1,0 +1,25 @@
+# Open-weight LLM on the GPU pool. The Hugging Face runtime picks vLLM
+# automatically for supported architectures and exposes the OpenAI API:
+#   http://qwen-predictor.models.svc.cluster.local/openai/v1/chat/completions
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: qwen
+  namespace: models
+spec:
+  predictor:
+    minReplicas: 1   # LLM cold starts take minutes: keep one replica warm
+    maxReplicas: 1
+    tolerations:
+      - { key: nvidia.com/gpu, operator: Exists, effect: NoSchedule }
+    model:
+      modelFormat: { name: huggingface }
+      storageUri: hf://Qwen/Qwen3-4B-Instruct-2507
+      args:
+        - --model_name=qwen
+        - --max_model_len=8192   # caps the KV cache so it fits into 20 GB VRAM
+      resources:
+        # Set a CPU limit explicitly: otherwise KServe applies the runtime's default
+        # limit (1 CPU), which is lower than the request and the Deployment is rejected.
+        limits: { cpu: "4", nvidia.com/gpu: "1", memory: 12Gi }   # stay below the GPU plan's RAM
+        requests: { cpu: "2", memory: 8Gi }

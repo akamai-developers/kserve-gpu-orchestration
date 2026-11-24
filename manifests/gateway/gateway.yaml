@@ -1,0 +1,18 @@
+# The public entry point (default setup: plain HTTP on the Gateway's IPv4 address).
+# NGINX Gateway Fabric provisions an NGINX data plane and a LoadBalancer Service
+# (an Akamai NodeBalancer) for this Gateway. Get the address with:
+#   kubectl get gateway public -n gateway -o jsonpath='{.status.addresses[0].value}'
+# For HTTPS with your own domain, see docs/https-with-custom-domain.md.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: public
+  namespace: gateway
+spec:
+  gatewayClassName: nginx
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces: { from: All }

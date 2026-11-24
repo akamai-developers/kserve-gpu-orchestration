@@ -1,0 +1,8 @@
+# Copy to terraform.tfvars and adjust.
+region         = "de-fra-2"
+k8s_version    = "1.34" # linode-cli lke versions-list
+cpu_node_type  = "g6-standard-4"
+cpu_node_count = 3
+gpu_node_type  = "g2-gpu-rtx4000a1-s" # linode-cli linodes types --text | grep -i gpu
+gpu_node_min   = 1
+gpu_node_max   = 2

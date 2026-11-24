@@ -1,0 +1,33 @@
+# HTTPS add-on (docs/https-with-custom-domain.md).
+# Replaces the default Gateway (manifests/gateway/gateway.yaml) with the same
+# HTTP listener plus an HTTPS listener for your hostname. cert-manager sees the
+# annotation and issues a Let's Encrypt certificate into Secret "api-tls".
+# Replace api.example.com with your hostname.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: public
+  namespace: gateway
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging   # switch to letsencrypt-prod once it works
+spec:
+  gatewayClassName: nginx
+  listeners:
+    # Unchanged from the default: the raw IP keeps working over HTTP. Requests
+    # for your hostname are redirected to HTTPS (httproute-redirect.yaml), and
+    # ACME challenges are answered here.
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces: { from: All }
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: api.example.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - { kind: Secret, name: api-tls }
+      allowedRoutes:
+        namespaces: { from: All }

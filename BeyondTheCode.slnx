@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Api/Api.csproj" />
+  </Folder>
+  <Folder Name="/iac/">
+    <Project Path="iac/pulumi/BeyondTheCode.Infra.csproj" />
+  </Folder>
+</Solution>
